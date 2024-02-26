@@ -17,7 +17,7 @@
 #define MT3_SENSOR 1
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  60        /* time to sleep in seconds*/
-#define WAKE_UP_TIME    60000
+// #define TIME_TO_SLEEP  60        /* time to sleep in seconds*/
+// #define WAKE_UP_TIME    60000
 
 #endif

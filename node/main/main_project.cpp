@@ -8,9 +8,12 @@
 #include "RF24.h"
 #include "main.h"
 #include "app_modbus.h"
+#include "credentials.h"
 
 
-uint16_t wake_timer=0;
+uint32_t wake_timer = 0;
+uint16_t TIME_TO_SLEEP;      /* time to sleep in seconds*/
+uint16_t WAKE_UP_TIME;       /* time to wake in sec */
 
 #define CE_PIN 7
 #define CSN_PIN 8
@@ -43,6 +46,7 @@ void setup(){
   while(!Serial){
     ; // wait for serial port to connect
   }
+  readSystemVariables();
   wake_timer = millis();
   Serial.println("starting");
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
@@ -52,9 +56,9 @@ void setup(){
 
 void loop(){
 
-   while( millis() - wake_timer < WAKE_UP_TIME)
+   while( millis() - wake_timer < WAKE_UP_TIME *1000)
    {   
-    wake_timer = millis();
+    
     Serial.println("inside waking perod");    
     delay(5000);
    }
