@@ -9,6 +9,9 @@
 #include "main.h"
 #include "app_modbus.h"
 
+
+uint16_t wake_timer=0;
+
 #define CE_PIN 7
 #define CSN_PIN 8
 // instantiate an object for the nRF24L01 transceiver
@@ -34,15 +37,29 @@ float payload = 0.0;
 
 
 
+
 void setup(){
   Serial.begin(115200);
   while(!Serial){
     ; // wait for serial port to connect
   }
+  wake_timer = millis();
+  Serial.println("starting");
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+
   modbus_init();
 }
 
 void loop(){
-    Serial.println("loop");
-    delay(1000);
+
+   while( millis() - wake_timer < WAKE_UP_TIME)
+   {   
+    wake_timer = millis();
+    Serial.println("inside waking perod");    
+    delay(5000);
+   }
+    
+    Serial.println("start sleep");
+    esp_deep_sleep_start();
+    Serial.println("loop");    // can not come here
 }
