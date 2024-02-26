@@ -6,6 +6,8 @@
 #include <SPI.h>
 #include "printf.h"
 #include "RF24.h"
+#include "main.h"
+#include "app_modbus.h"
 
 #define CE_PIN 7
 #define CSN_PIN 8
@@ -30,7 +32,6 @@ bool role = false;  // true = TX role, false = RX role
 float payload = 0.0;
 
 
-ModbusRTU mb;
 
 
 void setup(){
@@ -38,6 +39,7 @@ void setup(){
   while(!Serial){
     ; // wait for serial port to connect
   }
+  modbus_init();
 }
 
 void loop(){
