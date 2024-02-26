@@ -1,5 +1,6 @@
 #include <ModbusRTU.h>
 #include "main.h"
+#include <ArduinoJson.h>
 
 
 ModbusRTU mb;
@@ -47,3 +48,39 @@ void read_sensors_values()
 
 }
 
+
+void data_serializer()
+{
+
+ // Allocate the memory for the JSON document
+  StaticJsonBuffer<150> jsonBuffer;
+  
+  // Create the root JSON object
+  JsonObject& root = jsonBuffer.createObject();
+  
+  // Add the 'node' and 'bat' keys
+  root["n"] = 123;
+  root["b"] = 456;
+  
+  // Create the 'reading' array
+  JsonArray& reading = root.createNestedArray("reading");
+  
+  // Add sensor readings to the 'reading' array
+  #ifdef NPK_SENSOR
+    JsonObject& npkObj = reading.createNestedObject();
+    JsonArray& npkArray = npkObj.createNestedArray("npk");
+    npkArray.add(sn_N);
+    npkArray.add(sn_P);
+    npkArray.add(sn_K);
+  #endif
+  
+  // Serialize the JSON document to a string
+  String jsonStr;
+  root.printTo(jsonStr);
+  
+  // Print the JSON string
+  Serial.println(jsonStr);
+
+
+
+}

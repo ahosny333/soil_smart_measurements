@@ -1,6 +1,8 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
+#define NODE_ID 1
+
 #define NPK_SENSOR_ADDR 0x01
 #define EC_SENSOR_ADDR 0x02
 #define MT_SENSOR_ADDR 0x03
