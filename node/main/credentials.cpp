@@ -53,6 +53,7 @@ void saveSystemVariables() {
     }
     else
     {
+        DEBUG_PRINTLN("start save parameters");
         err = nvs_set_u16(my_handle, "TIME_TO_SLEEP", TIME_TO_SLEEP);
         err = nvs_set_u16(my_handle, "WAKE_UP_TIME", WAKE_UP_TIME);
         err = nvs_commit(my_handle);

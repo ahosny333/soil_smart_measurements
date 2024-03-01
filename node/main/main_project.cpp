@@ -17,6 +17,7 @@ uint32_t wake_timer = 0;
 uint16_t TIME_TO_SLEEP;      /* time to sleep in seconds*/
 uint16_t WAKE_UP_TIME;       /* time to wake in sec */
 extern char ap_name[30];
+extern bool flashUpdateRequest;
 
 #define CE_PIN 7
 #define CSN_PIN 8
@@ -78,6 +79,11 @@ void loop(){
     
     Serial.println("inside waking period");    
     delay(5000);
+    if(flashUpdateRequest)
+    {
+      flashUpdateRequest = false;
+      saveSystemVariables();
+    }
    }
     
     Serial.println("start sleep");

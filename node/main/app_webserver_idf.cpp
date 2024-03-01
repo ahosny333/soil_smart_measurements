@@ -16,6 +16,7 @@
 const char auth_username[15] = "admin";
 const char master_key[15] = "12345678";
 char auth_password[15] = "";
+bool flashUpdateRequest = false;
 extern uint16_t TIME_TO_SLEEP;      
 extern uint16_t WAKE_UP_TIME; 
 
@@ -320,7 +321,7 @@ esp_err_t http_server_get_handler(httpd_req_t *req)
                     if( atoi(word_temp) <= 120 && atoi(word_temp) > 0 ){
                     TIME_TO_SLEEP = atoi(word_temp) * 60;
                     error = false;
-                    //flashUpdateRequest = true;
+                    flashUpdateRequest = true;
                     }
                     else
                         error = true;
