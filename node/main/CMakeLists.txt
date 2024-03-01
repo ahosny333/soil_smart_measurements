@@ -15,7 +15,8 @@ set(srcs
 
 
 idf_component_register(SRCS ${srcs} 
-                    INCLUDE_DIRS ".")
+                    INCLUDE_DIRS "."
+                    EMBED_FILES "web/ota.html")
 
 #target_compile_options(${COMPONENT_LIB} PRIVATE  -Wno-error=char-subscripts -Wno-error=format-truncation -Wno-error=format-overflow -Wno-error=format -Wno-error=format-overflow)
 

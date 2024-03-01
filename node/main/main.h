@@ -4,6 +4,7 @@
 
 #define CLIENT "TEST"
 #define NODE_ID 1
+#define FIRMWARE_VERSION "1.1"
 
 //#define DEBUG 1
 #ifdef DEBUG

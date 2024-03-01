@@ -15,6 +15,9 @@
 
 const char auth_username[15] = "admin";
 const char master_key[15] = "12345678";
+char auth_password[15] = "";
+extern uint16_t TIME_TO_SLEEP;      
+extern uint16_t WAKE_UP_TIME; 
 
 /* const httpd related values stored in ROM */
 const static char http_200_hdr[] = "200 OK";
@@ -36,6 +39,10 @@ const static char http_content_type_gz[] ="application/x-gzip";
 // const static char http_cache_control_cache[] = "public, max-age=31536000";
 // const static char http_pragma_hdr[] = "Pragma";
 // const static char http_pragma_no_cache[] = "no-cache";
+
+// ota.html  
+extern const uint8_t ota_html_start[] asm("_binary_ota_html_start");
+extern const uint8_t ota_html_end[] asm("_binary_ota_html_end");
 
 /**
  * Decode URL-encoded string in place.
@@ -290,57 +297,142 @@ esp_err_t http_server_get_handler(httpd_req_t *req)
         httpd_resp_set_type(req,http_content_type_txt);
         httpd_resp_send(req, "ok", HTTPD_RESP_USE_STRLEN);
     }
+    else if(strstr(req->uri, "/settings"))
+    {
+
+        // if(basic_auth_get_handler(req,auth_password)!= ESP_OK)
+        // {
+        //     return ESP_FAIL;
+        // }
+       
+        bool error = false;
+        char*  buf;
+        size_t buf_len;
+        buf_len = httpd_req_get_url_query_len(req) + 1;
+        if (buf_len > 1) {
+            char byte_temp[2],word_temp[6],word_temp2[6];
+            buf = (char*)malloc(buf_len);
+            if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
+                urldecode(buf);
+                //ESP_LOGI(TAG, "Found URL query => %s", buf);
+                /* Get value of expected key from query string */
+                if (httpd_query_key_value(buf, "TIME_TO_SLEEP", word_temp, sizeof(word_temp)) == ESP_OK) {
+                    if( atoi(word_temp) <= 120 && atoi(word_temp) > 0 ){
+                    TIME_TO_SLEEP = atoi(word_temp) * 60;
+                    error = false;
+                    //flashUpdateRequest = true;
+                    }
+                    else
+                        error = true;
+                     memset(word_temp, 0, sizeof(word_temp));
+                }
+                
+            }
+            free(buf);
+
+        }
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Credentials", "true");
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Headers", "Authorization");
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
+        if (!error)
+        {
+            httpd_resp_set_status(req, http_200_hdr);
+            httpd_resp_set_type(req,http_content_type_txt);
+            httpd_resp_send(req, "Log in OK!", HTTPD_RESP_USE_STRLEN);
+        }
+        else{
+            httpd_resp_set_status(req, http_400_hdr);
+            httpd_resp_set_type(req,http_content_type_txt);
+            httpd_resp_send(req, "error", HTTPD_RESP_USE_STRLEN);
+        }
+    }
+
+    else if (strcmp(req->uri, "/get_settings") == 0)
+    {
+        //char text_string[200];
+        memset(text_string, 0, sizeof(text_string));
+        snprintf(text_string, sizeof(text_string),
+        "{"
+        "\"NODE_ID\":\"%d\","
+        "\"firmware_version\":\"%s\","
+        "\"time_to_sleep\":%d"
+        "}",
+        NODE_ID, FIRMWARE_VERSION,TIME_TO_SLEEP);
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");  
+        httpd_resp_set_status(req, http_200_hdr);
+        httpd_resp_set_type(req,http_content_type_txt);
+        httpd_resp_send(req, text_string, HTTPD_RESP_USE_STRLEN);
+    }
+    else if (strcmp(req->uri, "/ota.html") == 0)
+    {      
+        httpd_resp_set_status(req, http_200_hdr);
+        httpd_resp_set_type(req,http_content_type_html);
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Credentials", "true");
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Headers", "Authorization");
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
+        httpd_resp_send(req, (const char *)ota_html_start, ota_html_end - ota_html_start);
+    }
     return ESP_OK;
 }
 
 
 
-// /*
-//  * Handle OTA file upload
-//  */
-// esp_err_t update_post_handler(httpd_req_t *req)
-// {
-// 	char buf[1000];
-// 	esp_ota_handle_t ota_handle;
-// 	int remaining = req->content_len;
+/*
+ * Handle OTA file upload
+ */
+esp_err_t update_post_handler(httpd_req_t *req)
+{
+	char buf[1000];
+	esp_ota_handle_t ota_handle;
+	int remaining = req->content_len;
 
-// 	const esp_partition_t *ota_partition = esp_ota_get_next_update_partition(NULL);
-// 	ESP_ERROR_CHECK(esp_ota_begin(ota_partition, OTA_SIZE_UNKNOWN, &ota_handle));
+	const esp_partition_t *ota_partition = esp_ota_get_next_update_partition(NULL);
+	ESP_ERROR_CHECK(esp_ota_begin(ota_partition, OTA_SIZE_UNKNOWN, &ota_handle));
 
-// 	while (remaining > 0) {
-// 		int recv_len = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf)));
+	while (remaining > 0) {
+		int recv_len = httpd_req_recv(req, buf, MIN(remaining, sizeof(buf)));
 
-// 		// Timeout Error: Just retry
-// 		if (recv_len == HTTPD_SOCK_ERR_TIMEOUT) {
-// 			continue;
+		// Timeout Error: Just retry
+		if (recv_len == HTTPD_SOCK_ERR_TIMEOUT) {
+			continue;
 
-// 		// Serious Error: Abort OTA
-// 		} else if (recv_len <= 0) {
-// 			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Protocol Error");
-// 			return ESP_FAIL;
-// 		}
+		// Serious Error: Abort OTA
+		} else if (recv_len <= 0) {
+			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Protocol Error");
+			return ESP_FAIL;
+		}
 
-// 		// Successful Upload: Flash firmware chunk
-// 		if (esp_ota_write(ota_handle, (const void *)buf, recv_len) != ESP_OK) {
-// 			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Flash Error");
-// 			return ESP_FAIL;
-// 		}
+		// Successful Upload: Flash firmware chunk
+		if (esp_ota_write(ota_handle, (const void *)buf, recv_len) != ESP_OK) {
+			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Flash Error");
+			return ESP_FAIL;
+		}
 
-// 		remaining -= recv_len;
-// 	}
+		remaining -= recv_len;
+	}
 
-// 	// Validate and switch to new OTA image and reboot
-// 	if (esp_ota_end(ota_handle) != ESP_OK || esp_ota_set_boot_partition(ota_partition) != ESP_OK) {
-// 			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Validation / Activation Error");
-// 			return ESP_FAIL;
-// 	}
+	// Validate and switch to new OTA image and reboot
+	if (esp_ota_end(ota_handle) != ESP_OK || esp_ota_set_boot_partition(ota_partition) != ESP_OK) {
+			httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Validation / Activation Error");
+			return ESP_FAIL;
+	}
 
-// 	httpd_resp_sendstr(req, "Firmware update complete, rebooting now!");
-// 	vTaskDelay(500 / portTICK_PERIOD_MS);
-// 	esp_restart();
+	httpd_resp_sendstr(req, "Firmware update complete, rebooting now!");
+	vTaskDelay(500 / portTICK_PERIOD_MS);
+	esp_restart();
 
-// 	return ESP_OK;
-// }
+	return ESP_OK;
+}
+
+esp_err_t http_server_options_handler(httpd_req_t *req) {
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");  // Adjust origin as needed
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Credentials", "true");
+    httpd_resp_set_hdr(req, "Access-Control-Allow-Headers", "Authorization");  // Customize allowed headers
+    httpd_resp_set_status(req, http_200_hdr);
+    httpd_resp_set_type(req,http_content_type_txt);
+    httpd_resp_send(req, "OK", HTTPD_RESP_USE_STRLEN);
+    return ESP_OK;
+}
 
 httpd_uri_t http_server_get_request = {
 	.uri	  = "/*",
@@ -356,19 +448,19 @@ httpd_uri_t http_server_get_request = {
 // 	.user_ctx = NULL
 // };
 
-// httpd_uri_t http_server_options_request = {
-//     .uri       = "/*",  // Match any path
-//     .method    = HTTP_OPTIONS,
-//     .handler   = http_server_options_handler,  // Your OPTIONS handler
-//     .user_ctx  = NULL
-// };
+httpd_uri_t http_server_options_request = {
+    .uri       = "/*",  // Match any path
+    .method    = HTTP_OPTIONS,
+    .handler   = http_server_options_handler,  // Your OPTIONS handler
+    .user_ctx  = NULL
+};
 
-// httpd_uri_t update_post = {
-// 	.uri	  = "/ota_update",
-// 	.method   = HTTP_POST,
-// 	.handler  = update_post_handler,
-// 	.user_ctx = NULL
-// };
+httpd_uri_t update_post = {
+	.uri	  = "/update",
+	.method   = HTTP_POST,
+	.handler  = update_post_handler,
+	.user_ctx = NULL
+};
 
 static esp_err_t http_server_init(void)
 {
@@ -384,19 +476,19 @@ static esp_err_t http_server_init(void)
 
 	if (httpd_start(&http_server, &config) == ESP_OK) {
 
-    basic_auth_info_t *basic_auth_info = (basic_auth_info_t *)calloc(1, sizeof(basic_auth_info_t));
-    if (basic_auth_info) {
-        basic_auth_info->username = (char*)auth_username;//"admin";
-        basic_auth_info->password = (char*)master_key;//"12345678";
+        basic_auth_info_t *basic_auth_info = (basic_auth_info_t *)calloc(1, sizeof(basic_auth_info_t));
+        if (basic_auth_info) {
+            basic_auth_info->username = (char*)auth_username;//"admin";
+            basic_auth_info->password = (char*)master_key;//"12345678";
 
-        http_server_get_request.user_ctx = basic_auth_info;
-        httpd_register_uri_handler(http_server, &http_server_get_request);
-        // pw_change_post_request.user_ctx = basic_auth_info;
-        // httpd_register_uri_handler(http_server, &pw_change_post_request);
-        // http_server_options_request.user_ctx = basic_auth_info;
-        // httpd_register_uri_handler(http_server, &http_server_options_request);
-    }
-		// httpd_register_uri_handler(http_server, &update_post);
+            http_server_get_request.user_ctx = basic_auth_info;
+            httpd_register_uri_handler(http_server, &http_server_get_request);
+            // pw_change_post_request.user_ctx = basic_auth_info;
+            // httpd_register_uri_handler(http_server, &pw_change_post_request);
+            http_server_options_request.user_ctx = basic_auth_info;
+            httpd_register_uri_handler(http_server, &http_server_options_request);
+        }
+            httpd_register_uri_handler(http_server, &update_post);
 	}
 
 	return http_server == NULL ? ESP_FAIL : ESP_OK;
