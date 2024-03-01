@@ -6,7 +6,7 @@
 #include <esp_wifi.h>
 #include "main.h"
 
-static char ap_name[30];
+char ap_name[30];
 static uint32_t initial_ap_timer = 0;
 char default_auth_password[] ="12345678";
 

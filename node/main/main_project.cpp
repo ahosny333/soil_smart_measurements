@@ -4,16 +4,19 @@
 #include <IOXhop_FirebaseESP32.h>
 #include <ModbusRTU.h>
 #include <SPI.h>
+#include <ESPmDNS.h>
 #include "printf.h"
 #include "RF24.h"
 #include "main.h"
 #include "app_modbus.h"
 #include "credentials.h"
 #include "app_wifi.h"
+#include "app_webserver_idf.h"
 
 uint32_t wake_timer = 0;
 uint16_t TIME_TO_SLEEP;      /* time to sleep in seconds*/
 uint16_t WAKE_UP_TIME;       /* time to wake in sec */
+extern char ap_name[30];
 
 #define CE_PIN 7
 #define CSN_PIN 8
@@ -53,11 +56,24 @@ void setup(){
   modbus_init();
   data_serializer();
   wm_init();
+  if (WiFi.getMode() == WIFI_AP)
+    {
+      DEBUG_PRINTLN("access point mode");
+      if(MDNS.begin(ap_name)) {
+       MDNS.addService("http", "tcp", 80);
+      } else {
+        Serial.println("Error starting mDNS");
+      }
+      webserver_task();
+      
+    }
+  
 }
 
 void loop(){
 
-   while( millis() - wake_timer < WAKE_UP_TIME *1000)
+  //  while( millis() - wake_timer < WAKE_UP_TIME *1000)
+  while( millis() - wake_timer < 240 *1000)
    {   
     
     Serial.println("inside waking period");    

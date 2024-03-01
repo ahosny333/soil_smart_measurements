@@ -9,6 +9,7 @@ set(srcs
     app_modbus.cpp
     credentials.cpp
     app_wifi.cpp
+    app_webserver_idf.cpp
   )
 
 
