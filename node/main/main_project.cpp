@@ -9,7 +9,7 @@
 #include "main.h"
 #include "app_modbus.h"
 #include "credentials.h"
-
+#include "app_wifi.h"
 
 uint32_t wake_timer = 0;
 uint16_t TIME_TO_SLEEP;      /* time to sleep in seconds*/
@@ -50,9 +50,9 @@ void setup(){
   wake_timer = millis();
   Serial.println("starting");
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
-
   modbus_init();
   data_serializer();
+  wm_init();
 }
 
 void loop(){
@@ -60,7 +60,7 @@ void loop(){
    while( millis() - wake_timer < WAKE_UP_TIME *1000)
    {   
     
-    Serial.println("inside waking perod");    
+    Serial.println("inside waking period");    
     delay(5000);
    }
     

@@ -7,9 +7,11 @@ ModbusRTU mb;
 uint16_t regs[5];
 
 #ifdef NPK_SENSOR
-  uint16_t sn_N,sn_P,sn_K;
+  uint16_t NPK_N,NPK_P,NPK_K;
 #endif
-
+#ifdef NPK_SENSOR
+  uint16_t EC_ec,EC_tds;
+#endif
 
 bool HRead(Modbus::ResultCode event, uint16_t transactionId, void* data) {
   Serial.print("Request result: 0x");
@@ -36,9 +38,9 @@ void read_sensors_values()
       mb.task();
       delay(10);
     }
-    sn_N = float(regs[0]);
-    sn_P = float(regs[1]);
-    sn_K = float(regs[2]);
+    NPK_N = float(regs[0]);
+    NPK_P = float(regs[1]);
+    NPK_K = float(regs[2]);
     Serial.println(regs[0]);
     Serial.println(regs[1]);
     Serial.println(regs[2]);
@@ -53,26 +55,35 @@ void data_serializer()
 {
 
  // Allocate the memory for the JSON document
-  StaticJsonBuffer<150> jsonBuffer;
+  StaticJsonBuffer<300> jsonBuffer;
   
   // Create the root JSON object
   JsonObject& root = jsonBuffer.createObject();
   
   // Add the 'node' and 'bat' keys
-  root["n"] = 123;
+  root["n"] = NODE_ID;
   root["b"] = 456;
   
   // Create the 'reading' array
-  JsonArray& reading = root.createNestedArray("reading");
+  JsonArray& reading = root.createNestedArray("r");
   
   // Add sensor readings to the 'reading' array
   #ifdef NPK_SENSOR
     JsonObject& npkObj = reading.createNestedObject();
     JsonArray& npkArray = npkObj.createNestedArray("npk");
-    npkArray.add(sn_N);
-    npkArray.add(sn_P);
-    npkArray.add(sn_K);
+    npkArray.add(NPK_N);
+    npkArray.add(NPK_P);
+    npkArray.add(NPK_K);
   #endif
+
+  #ifdef EC_SENSOR
+    JsonObject& ecObj = reading.createNestedObject();
+    JsonArray& ecArray = ecObj.createNestedArray("ec");
+    ecArray.add(EC_ec);
+    ecArray.add(EC_tds);
+    Serial.println("ec sensor");
+  #endif
+  
   
   // Serialize the JSON document to a string
   String jsonStr;
