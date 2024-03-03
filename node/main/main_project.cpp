@@ -5,6 +5,7 @@
 #include <ModbusRTU.h>
 #include <SPI.h>
 #include <ESPmDNS.h>
+#include <ESP32Time.h>
 #include "printf.h"
 #include "RF24.h"
 #include "main.h"
@@ -12,6 +13,10 @@
 #include "credentials.h"
 #include "app_wifi.h"
 #include "app_webserver_idf.h"
+
+//ESP32Time rtc;
+ESP32Time rtc(0);
+struct tm timeinfo;
 
 uint32_t wake_timer = 0;
 uint16_t TIME_TO_SLEEP;      /* time to sleep in seconds*/
@@ -51,6 +56,7 @@ void setup(){
     ; // wait for serial port to connect
   }
   readSystemVariables();
+  rtc.setTime(30, 24, 15, 17, 1, 2021);
   wake_timer = millis();
   Serial.println("starting");
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
@@ -77,7 +83,11 @@ void loop(){
   while( millis() - wake_timer < 240 *1000)
    {   
     
-    Serial.println("inside waking period");    
+    Serial.println("inside waking period");   
+    Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));   // (String) returns time with specified format 
+    // formating options  http://www.cplusplus.com/reference/ctime/strftime/
+    timeinfo = rtc.getTimeStruct(); 
+
     delay(5000);
     if(flashUpdateRequest)
     {
