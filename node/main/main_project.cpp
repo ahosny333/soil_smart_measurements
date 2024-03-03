@@ -16,8 +16,7 @@
 
 //ESP32Time rtc;
 ESP32Time rtc(0);
-struct tm timeinfo;
-
+bool rtc_done = false;
 uint32_t wake_timer = 0;
 uint16_t TIME_TO_SLEEP;      /* time to sleep in seconds*/
 uint16_t WAKE_UP_TIME;       /* time to wake in sec */
@@ -56,7 +55,6 @@ void setup(){
     ; // wait for serial port to connect
   }
   readSystemVariables();
-  rtc.setTime(30, 24, 15, 17, 1, 2021);
   wake_timer = millis();
   Serial.println("starting");
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
@@ -84,9 +82,8 @@ void loop(){
    {   
     
     Serial.println("inside waking period");   
-    Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));   // (String) returns time with specified format 
-    // formating options  http://www.cplusplus.com/reference/ctime/strftime/
-    timeinfo = rtc.getTimeStruct(); 
+    if(rtc_done)
+      Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));   // (String) returns time with specified format 
 
     delay(5000);
     if(flashUpdateRequest)

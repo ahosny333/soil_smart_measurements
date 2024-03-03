@@ -10,6 +10,7 @@
 //#include <esp_wifi.h>
 #include <esp_log.h>
 #include <WebServer.h>
+#include <ESP32Time.h>
 #include "mbedtls/base64.h"
 #include "main.h"
 
@@ -19,7 +20,8 @@ char auth_password[15] = "";
 bool flashUpdateRequest = false;
 extern uint16_t TIME_TO_SLEEP;      
 extern uint16_t WAKE_UP_TIME; 
-
+extern ESP32Time rtc;
+extern bool rtc_done;
 /* const httpd related values stored in ROM */
 const static char http_200_hdr[] = "200 OK";
 // const static char http_302_hdr[] = "302 Found";
@@ -363,6 +365,45 @@ esp_err_t http_server_get_handler(httpd_req_t *req)
         httpd_resp_set_status(req, http_200_hdr);
         httpd_resp_set_type(req,http_content_type_txt);
         httpd_resp_send(req, text_string, HTTPD_RESP_USE_STRLEN);
+    }
+    else if (strstr(req->uri, "/sync"))
+    {
+        memset(text_string, 0, sizeof(text_string));          
+        char*  buf;
+        size_t buf_len;
+        char temp_v[16];
+        buf_len = httpd_req_get_url_query_len(req) + 1;
+        if (buf_len > 1) {
+            buf = (char*)malloc(buf_len);
+            if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
+                //urldecode(buf);
+                //ESP_LOGI(TAG, "Found URL query => %s", buf);
+                /* Get value of expected key from query string */
+                if (httpd_query_key_value(buf, "ts", temp_v, sizeof(temp_v)) == ESP_OK) {
+                    //ESP_LOGI(TAG, "Found URL query => %s", buf);
+                    rtc.setTime(atoi(temp_v));
+                    rtc_done = true;
+                    flashUpdateRequest = true;
+                    memset(text_string, 0, sizeof(text_string));
+                    sprintf(text_string,"ok");
+                }
+            }
+            else
+            {
+                sprintf(text_string,"error");
+                rtc_done = false;
+            }
+            free(buf);
+        }
+        else
+        {
+            sprintf(text_string,"error");
+            rtc_done = false;
+        }
+
+        httpd_resp_set_status(req, http_200_hdr);
+        httpd_resp_set_type(req,http_content_type_txt);
+        httpd_resp_send(req,text_string, HTTPD_RESP_USE_STRLEN);
     }
     else if (strcmp(req->uri, "/ota.html") == 0)
     {      
