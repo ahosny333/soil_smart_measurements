@@ -16,23 +16,20 @@
 #include "RTClib.h"
 #include "app_sd.h"
 
-
-//ESP32Time rtc;
+// ESP32Time rtc;
 ESP32Time rtc(0);
 bool rtc_done = false;
 uint32_t wake_timer = 0;
-uint16_t TIME_TO_SLEEP;      /* time to sleep in seconds*/
-uint16_t WAKE_UP_TIME;       /* time to wake in sec */
+uint16_t TIME_TO_SLEEP; /* time to sleep in seconds*/
+uint16_t WAKE_UP_TIME;  /* time to wake in sec */
 extern char ap_name[30];
 extern bool flashUpdateRequest;
 
-
-
-
-
-void setup(){
+void setup()
+{
   Serial.begin(115200);
-  while(!Serial){
+  while (!Serial)
+  {
     ; // wait for serial port to connect
   }
   readSystemVariables();
@@ -44,39 +41,41 @@ void setup(){
   data_serializer();
   wm_init();
   if (WiFi.getMode() == WIFI_AP)
+  {
+    DEBUG_PRINTLN("access point mode");
+    if (MDNS.begin(ap_name))
     {
-      DEBUG_PRINTLN("access point mode");
-      if(MDNS.begin(ap_name)) {
-       MDNS.addService("http", "tcp", 80);
-      } else {
-        Serial.println("Error starting mDNS");
-      }
-      webserver_task();
-      
+      MDNS.addService("http", "tcp", 80);
     }
-  
+    else
+    {
+      Serial.println("Error starting mDNS");
+    }
+    webserver_task();
+  }
 }
 
-void loop(){
+void loop()
+{
 
   //  while( millis() - wake_timer < WAKE_UP_TIME *1000)
-  while( millis() - wake_timer < 240 *1000)
-   {   
-    
-    // Serial.println("inside waking period");   
+  while (millis() - wake_timer < 240 * 1000)
+  {
+
+    // Serial.println("inside waking period");
     // if(rtc_done)
-    //   Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));   // (String) returns time with specified format 
+    //   Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));   // (String) returns time with specified format
     read_sensors_values();
     data_serializer();
     delay(5000);
-    if(flashUpdateRequest)
+    if (flashUpdateRequest)
     {
       flashUpdateRequest = false;
       saveSystemVariables();
     }
-   }
-    
-    Serial.println("start sleep");
-    esp_deep_sleep_start();
-    Serial.println("loop");    // can not come here
+  }
+
+  Serial.println("start sleep");
+  esp_deep_sleep_start();
+  Serial.println("loop"); // can not come here
 }
