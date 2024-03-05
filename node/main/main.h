@@ -26,7 +26,8 @@
 #define EC_SENSOR_ADDR 0x02
 #define MT_SENSOR_ADDR 0x03
 #define PH_SENSOR_ADDR 0x04
-#define T_M_EC_S_SENSOR_ADDR 0x05
+
+#define T_M_EC_S_SENSOR_ADDR 0x05 //TRUE
 
 
 

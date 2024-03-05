@@ -23,6 +23,7 @@ extern uint16_t WAKE_UP_TIME;
 extern ESP32Time rtc;
 extern bool rtc_done;
 extern bool sd_exist;
+extern String jsonStr;
 /* const httpd related values stored in ROM */
 const static char http_200_hdr[] = "200 OK";
 // const static char http_302_hdr[] = "302 Found";
@@ -361,6 +362,16 @@ esp_err_t http_server_get_handler(httpd_req_t *req)
         "\"firmware_version\":\"%s\","
         "\"time_to_sleep\":%d,\"sd_card\":%d}",
         NODE_ID, FIRMWARE_VERSION,TIME_TO_SLEEP,sd_exist);
+        httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");  
+        httpd_resp_set_status(req, http_200_hdr);
+        httpd_resp_set_type(req,http_content_type_txt);
+        httpd_resp_send(req, text_string, HTTPD_RESP_USE_STRLEN);
+    }
+    else if (strcmp(req->uri, "/get_readings") == 0)
+    {
+        //char text_string[200];
+        memset(text_string, 0, sizeof(text_string));
+        jsonStr.toCharArray(text_string, 1822);
         httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");  
         httpd_resp_set_status(req, http_200_hdr);
         httpd_resp_set_type(req,http_content_type_txt);
