@@ -2,6 +2,7 @@
 #include "main.h"
 #include <ArduinoJson.h>
 
+String jsonStr;
 ModbusRTU mb;
 uint16_t regs[5];
 bool mb_success = false;
@@ -179,7 +180,7 @@ else
 #endif
 
   // Serialize the JSON document to a string
-  String jsonStr;
+  jsonStr.clear();
   root.printTo(jsonStr);
 
   // Print the JSON string
