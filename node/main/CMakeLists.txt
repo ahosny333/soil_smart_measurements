@@ -10,6 +10,7 @@ set(srcs
     credentials.cpp
     app_wifi.cpp
     app_webserver_idf.cpp
+    app_sd.cpp
   )
 
 

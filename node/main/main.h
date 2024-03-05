@@ -37,6 +37,7 @@
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 #define INITIAL_AP_TIME 60000
 #define AP_MODE_PIN 21
+#define sd_card_ss_pin 5
 // #define TIME_TO_SLEEP  60        /* time to sleep in seconds*/
 // #define WAKE_UP_TIME    60000
 

@@ -22,6 +22,7 @@ extern uint16_t TIME_TO_SLEEP;
 extern uint16_t WAKE_UP_TIME; 
 extern ESP32Time rtc;
 extern bool rtc_done;
+extern bool sd_exist;
 /* const httpd related values stored in ROM */
 const static char http_200_hdr[] = "200 OK";
 // const static char http_302_hdr[] = "302 Found";
@@ -358,9 +359,8 @@ esp_err_t http_server_get_handler(httpd_req_t *req)
         "{"
         "\"NODE_ID\":\"%d\","
         "\"firmware_version\":\"%s\","
-        "\"time_to_sleep\":%d"
-        "}",
-        NODE_ID, FIRMWARE_VERSION,TIME_TO_SLEEP);
+        "\"time_to_sleep\":%d,\"sd_card\":%d}",
+        NODE_ID, FIRMWARE_VERSION,TIME_TO_SLEEP,sd_exist);
         httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");  
         httpd_resp_set_status(req, http_200_hdr);
         httpd_resp_set_type(req,http_content_type_txt);
