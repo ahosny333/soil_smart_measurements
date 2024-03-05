@@ -19,20 +19,34 @@
 #define DEBUG_PRINTLNDEC(x)
 #endif
 
-#define NPK_SENSOR_ADDR 0x01
+#define NPK_SENSOR_ADDR 0x01//////
 #define EC_SENSOR_ADDR 0x02
 #define MT_SENSOR_ADDR 0x03
 #define PH_SENSOR_ADDR 0x04
-#define MT2_SENSOR_ADDR 0x05
-#define MT3_SENSOR_ADDR 0x06
+#define T_M_EC_S_SENSOR_ADDR 0x05
 
 
-#define NPK_SENSOR 1
-#define EC_SENSOR 1
+
+#define NPK_SENSOR 0
+#define EC_SENSOR 0
 #define MT_SENSOR 0
 #define PH_SENSOR 0
-#define MT2_SENSOR 0
-#define MT3_SENSOR 0
+#define T_M_EC_S_SENSOR 1
+
+
+#ifdef NPK_SENSOR
+#define NPK_SENSOR_START_ADD 0x001E////////
+#endif
+
+#ifdef EC_SENSOR
+#define EC_SENSOR_START_ADD 0x002E
+#endif
+
+#ifdef T_M_EC_S_SENSOR
+#define T_M_EC_S_SENSOR_START_ADD 0x0000
+#endif
+
+
 
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 #define INITIAL_AP_TIME 60000
