@@ -27,11 +27,11 @@
 #endif
 
 // modbus settings
-#define max_retries 5
+#define max_retries 2 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define NPK_SENSOR_ADDR 0x01 ///////////////////////////////////////////////done
 #define EC_SENSOR_ADDR 0x02
-#define MT_SENSOR_ADDR 0x03
+#define MT_SENSOR_ADDR 0x03///////////////////////////////////////////////////////////////////////////////////////true
 #define PH_SENSOR_ADDR 0x04
 
 #define T_M_EC_S_SENSOR_ADDR 0x05 // TRUE/////////////////////////////////////////////////////
@@ -39,7 +39,7 @@
 
 #define NPK_SENSOR 1 ////////////////////////////////////////////////done
 // #define EC_SENSOR
-// #define MT_SENSOR
+#define MT_SENSOR 1 /////////////////////////////////////done
 // #define PH_SENSOR
 #define T_M_EC_S_SENSOR 1 // to set slave id use address 254 and start address 201 in qmodmaster fc = 0x06 then write the required id to 5
 
@@ -47,9 +47,11 @@
 #define NPK_SENSOR_START_ADD 0x001E 
 #endif
 
-#ifdef EC_SENSOR
-#define EC_SENSOR_START_ADD 0x002E
+#ifdef  MT_SENSOR
+#define MT_SENSOR_START_ADD 0x0000// CHANEABLE
 #endif
+
+
 
 #ifdef T_M_EC_S_SENSOR////////////////////////////////////////
 #define T_M_EC_S_SENSOR_START_ADD 0x0000

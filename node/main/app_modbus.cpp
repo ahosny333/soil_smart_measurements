@@ -10,6 +10,7 @@ bool mb_success = false;
 
 #ifdef NPK_SENSOR
 uint16_t NPK_N, NPK_P, NPK_K;
+bool NPK_ok = false;
 #endif
 
 #ifdef EC_SENSOR
@@ -18,6 +19,7 @@ uint16_t EC_ec, EC_tds;
 
 #ifdef MT_SENSOR
 uint16_t MT_M, MT_T;
+bool MT_ok = false;
 #endif
 
 #ifdef T_M_EC_S_SENSOR
@@ -65,16 +67,25 @@ void read_sensors_values()
     }
 
     delay(1000);
+    if (mb_success == true)
+    {
+      T_M_EC_S_T = float(regs[0]);
+      T_M_EC_S_M = float(regs[1]);
+      T_M_EC_S_EC = float(regs[2]);
+      T_M_EC_S_S = float(regs[3]);
+    }
+    else
+    {
+      T_M_EC_S_T = 0;
+      T_M_EC_S_M = 0;
+      T_M_EC_S_EC = 0;
+      T_M_EC_S_S = 0;
+    }
 
-    T_M_EC_S_T = float(regs[0]);
-    T_M_EC_S_M = float(regs[1]);
-    T_M_EC_S_EC = float(regs[2]);
-    T_M_EC_S_S = float(regs[3]);
-
-    Serial.println(regs[0]);
-    Serial.println(regs[1]);
-    Serial.println(regs[2]);
-    Serial.println(regs[3]);
+    Serial.println(T_M_EC_S_T);
+    Serial.println(T_M_EC_S_M);
+    Serial.println(T_M_EC_S_EC);
+    Serial.println(T_M_EC_S_S);
 
     delay(1000);
     retry_counter++;
@@ -110,13 +121,22 @@ void read_sensors_values()
 
     delay(1000);
 
-    NPK_N = float(regs[0]);
-    NPK_P = float(regs[1]);
-    NPK_K = float(regs[2]);
+    if (mb_success == true)
+    {
+      NPK_N = float(regs[0]);
+      NPK_P = float(regs[1]);
+      NPK_K = float(regs[2]);
+    }
+    else
+    {
+      NPK_N = 0;
+      NPK_P = 0;
+      NPK_K = 0;
+    }
 
-    Serial.println(regs[0]);
-    Serial.println(regs[1]);
-    Serial.println(regs[2]);
+    Serial.println(NPK_N);
+    Serial.println(NPK_P);
+    Serial.println(NPK_K);
 
     delay(1000);
     retry_counter++;
@@ -131,7 +151,54 @@ void read_sensors_values()
     T_M_EC_S_ok = true;
   }
 #endif
+  Serial.println("------------------------------------------------");
+  Serial.println("MT_SENSOR");
 
+  //////////////////////
+
+#ifdef MT_SENSOR
+  retry_counter = 0;
+  addr = MT_SENSOR_START_ADD;
+  mb_success = false;
+  while (mb_success == false && retry_counter < max_retries)
+  {
+    // Check if no transaction in progress
+    mb.readHreg(MT_SENSOR_ADDR, addr, regs, 2, HRead); // Send Read Hreg from Modbus Server
+    while (mb.slave())
+    { // Check if transaction is active
+      mb.task();
+      delay(10);
+    }
+
+    delay(1000);
+
+    if (mb_success == true)
+    {
+      MT_M = float(regs[0]);
+      MT_T = float(regs[1]);
+    }
+    else
+    {
+      MT_M = 0;
+      MT_T = 0;
+    }
+
+    Serial.println(MT_M);
+    Serial.println(MT_T);
+
+    delay(1000);
+    retry_counter++;
+  }
+
+  if (mb_success == false)
+  {
+    T_M_EC_S_ok = false;
+  }
+  else
+  {
+    T_M_EC_S_ok = true;
+  }
+#endif
 }
 
 void data_serializer()
