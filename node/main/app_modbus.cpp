@@ -4,7 +4,7 @@
 
 ModbusRTU mb;
 uint16_t regs[5];
-
+bool mb_success = false;
 #ifdef NPK_SENSOR
 uint16_t NPK_N, NPK_P, NPK_K;
 #endif
@@ -19,12 +19,17 @@ uint16_t MT_M, MT_T;
 
 #ifdef T_M_EC_S_SENSOR
 uint16_t T_M_EC_S_T, T_M_EC_S_M, T_M_EC_S_EC, T_M_EC_S_S;
+bool T_M_EC_S_ok = false;
 #endif
 
 bool HRead(Modbus::ResultCode event, uint16_t transactionId, void *data)
 {
   Serial.print("Request result: 0x");
   Serial.println(event, HEX);
+  if(event == 0x00 )
+  {
+    mb_success = true;
+  }
   return true;
 }
 
@@ -80,16 +85,19 @@ void read_sensors_values()
 
 
 #ifdef T_M_EC_S_SENSOR
+  uint8_t retry_counter = 0;
   addr = T_M_EC_S_SENSOR_START_ADD;
-  if (!mb.slave())
-  {                                                    // Check if no transaction in progress
+  mb_success = false;
+  while (mb_success == false && retry_counter < max_retries)
+  {  
+                                                   // Check if no transaction in progress
     mb.readHreg(T_M_EC_S_SENSOR_ADDR, addr, regs, 4, HRead); // Send Read Hreg from Modbus Server
     while (mb.slave())
     { // Check if transaction is active
       mb.task();
       delay(10);
     }
-
+    delay(1000);
     T_M_EC_S_T = float(regs[0]);
     T_M_EC_S_M = float(regs[1]);
     T_M_EC_S_EC = float(regs[2]);
@@ -98,10 +106,22 @@ void read_sensors_values()
     Serial.println(regs[1]);
     Serial.println(regs[2]);
     Serial.println(regs[3]);
+    delay(1000);
+    retry_counter++;
   }
-  delay(1000);
+  
+  if(mb_success == false)
+  {
+    T_M_EC_S_ok = false;
+  }
+  else
+  {
+    T_M_EC_S_ok = true;
+  }
 #endif
+
 }
+
 
 void data_serializer()
 {
@@ -134,6 +154,28 @@ void data_serializer()
   ecArray.add(EC_ec);
   ecArray.add(EC_tds);
   Serial.println("ec sensor");
+#endif
+
+#ifdef T_M_EC_S_SENSOR
+if(T_M_EC_S_ok)
+{
+  JsonObject &T_M_EC_S_Obj = reading.createNestedObject();
+  JsonArray &T_M_EC_S_Array = T_M_EC_S_Obj.createNestedArray("T_M_EC_S");
+  T_M_EC_S_Array.add(T_M_EC_S_T);
+  T_M_EC_S_Array.add(T_M_EC_S_M);
+  T_M_EC_S_Array.add(T_M_EC_S_EC);
+  T_M_EC_S_Array.add(T_M_EC_S_S);
+}
+else
+{
+  JsonObject &T_M_EC_S_Obj = reading.createNestedObject();
+  JsonArray &T_M_EC_S_Array = T_M_EC_S_Obj.createNestedArray("T_M_EC_S");
+  T_M_EC_S_Array.add("0");
+  T_M_EC_S_Array.add("0");
+  T_M_EC_S_Array.add("0");
+  T_M_EC_S_Array.add("0");
+
+}
 #endif
 
   // Serialize the JSON document to a string

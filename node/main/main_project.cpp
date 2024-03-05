@@ -67,6 +67,7 @@ void loop(){
     // if(rtc_done)
     //   Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));   // (String) returns time with specified format 
     read_sensors_values();
+    data_serializer();
     delay(5000);
     if(flashUpdateRequest)
     {

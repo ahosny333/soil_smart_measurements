@@ -19,7 +19,10 @@
 #define DEBUG_PRINTLNDEC(x)
 #endif
 
-#define NPK_SENSOR_ADDR 0x01//////
+// modbus settings
+#define max_retries 5
+
+#define NPK_SENSOR_ADDR 0x01
 #define EC_SENSOR_ADDR 0x02
 #define MT_SENSOR_ADDR 0x03
 #define PH_SENSOR_ADDR 0x04
@@ -27,11 +30,11 @@
 
 
 
-#define NPK_SENSOR 0
-#define EC_SENSOR 0
-#define MT_SENSOR 0
-#define PH_SENSOR 0
-#define T_M_EC_S_SENSOR 1
+// #define NPK_SENSOR 
+// #define EC_SENSOR 
+// #define MT_SENSOR 
+// #define PH_SENSOR 
+#define T_M_EC_S_SENSOR 1   // to set slave id use address 254 and start address 201 in qmodmaster fc = 0x06 then write the required id to 5
 
 
 #ifdef NPK_SENSOR
