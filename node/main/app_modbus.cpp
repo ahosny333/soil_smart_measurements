@@ -1,6 +1,7 @@
 #include <ModbusRTU.h>
 #include "main.h"
 #include <ArduinoJson.h>
+#include "app_modbus.h"
 
 String jsonStr;
 ModbusRTU mb;
@@ -32,6 +33,10 @@ bool EC_ok = false;
 uint16_t PH_T, PH_M;
 bool PH_ok = false;
 #endif
+
+
+
+Data_Package data; 
 
 bool HRead(Modbus::ResultCode event, uint16_t transactionId, void *data)
 {
@@ -77,9 +82,12 @@ void read_sensors_values()
 
     if (mb_success == true)
     {
-      NPK_N = float(regs[0]);
-      NPK_P = float(regs[1]);
-      NPK_K = float(regs[2]);
+      NPK_N = regs[0];
+      NPK_P = regs[1];
+      NPK_K = regs[2];
+      data.NPK_N = NPK_N;
+      data.NPK_P = NPK_P;
+      data.NPK_K = NPK_K;
     }
     else
     {
