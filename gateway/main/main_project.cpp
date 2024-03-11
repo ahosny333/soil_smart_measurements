@@ -9,15 +9,17 @@
 #include "app_rf.h"
 #include "app_firebase.h"
 
+const char *ssid = "ICITY";
+const char *password = "iEgyptCity";
 
 
 void setup(){
   Serial.begin(115200);
   while(!Serial){
-    ; // wait for serial port to connect
+    delay(1000);
   }
   rf_init();
-  WiFi.begin("eng.hosni", "ahmedhosnyohaj");                                        
+  WiFi.begin(ssid, password);                                       
   Serial.print("Connecting to WIFI");
   while (WiFi.status() != WL_CONNECTED) {
   Serial.print(".");
