@@ -34,9 +34,7 @@ uint16_t PH_T, PH_M;
 bool PH_ok = false;
 #endif
 
-
-
-Data_Package data; 
+Data_Package data;
 
 bool HRead(Modbus::ResultCode event, uint16_t transactionId, void *data)
 {
@@ -131,12 +129,15 @@ void read_sensors_values()
       delay(10);
     }
 
+
     delay(1000);
 
     if (mb_success == true)
     {
-      MT_M = float(regs[0]);
-      MT_T = float(regs[1]);
+      MT_M = regs[0];
+      MT_T = regs[1];
+      data.MT_M = MT_M;
+      data.MT_T = MT_T;
     }
     else
     {
@@ -180,10 +181,14 @@ void read_sensors_values()
     delay(1000);
     if (mb_success == true)
     {
-      T_M_EC_S_T = float(regs[0]);
-      T_M_EC_S_M = float(regs[1]);
-      T_M_EC_S_EC = float(regs[2]);
-      T_M_EC_S_S = float(regs[3]);
+      T_M_EC_S_T = regs[0];
+      T_M_EC_S_M = regs[1];
+      T_M_EC_S_EC = regs[2];
+      T_M_EC_S_S = regs[3];
+      data.T_M_EC_S_T = T_M_EC_S_T;
+      data.T_M_EC_S_M = T_M_EC_S_M;
+      data.T_M_EC_S_EC = T_M_EC_S_EC;
+      data.T_M_EC_S_S = T_M_EC_S_S;
     }
     else
     {
@@ -419,8 +424,6 @@ void data_serializer()
     PH_Array.add("0");
   }
 #endif
-
-
 
   // Serialize the JSON document to a string
   jsonStr.clear();
