@@ -9,5 +9,6 @@
 #define FIREBASE_authorization_key "siClksVtqW11OYX8AiR57z0rIHIe9Q3myAAOpXf7"
 
 void firebase_init();
+void firebase_update_readings();
 
 #endif
