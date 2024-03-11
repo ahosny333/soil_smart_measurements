@@ -6,6 +6,7 @@ set(requires arduino ArduinoJson Modbus)
 set(COMPONENT_REQUIRES ${requires} )
 set(srcs
     main_project.cpp
+    app_rf.cpp
   )
 
 

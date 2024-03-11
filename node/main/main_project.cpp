@@ -15,6 +15,7 @@
 #include "app_webserver_idf.h"
 #include "RTClib.h"
 #include "app_sd.h"
+#include "app_rf.h"
 
 // ESP32Time rtc;
 ESP32Time rtc(0);
@@ -38,6 +39,7 @@ void setup()
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   sd_card_init();
   modbus_init();
+  rf_init();
   data_serializer();
   wm_init();
   if (WiFi.getMode() == WIFI_AP)
@@ -67,6 +69,7 @@ void loop()
     //   Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));   // (String) returns time with specified format
     read_sensors_values();
     data_serializer();
+    rf_send_data();
     delay(5000);
     if (flashUpdateRequest)
     {
