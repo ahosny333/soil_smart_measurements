@@ -6,12 +6,12 @@
 #include <SPI.h>
 #include "printf.h"
 #include "RF24.h"
+#include "main.h"
 #include "app_rf.h"
 #include "app_firebase.h"
+#include "app_wm.h"
 
-const char *ssid = "ICITY";
-const char *password = "iEgyptCity";
-
+extern bool wifi_connected;
 
 void setup(){
   Serial.begin(115200);
@@ -19,20 +19,14 @@ void setup(){
     delay(1000);
   }
   rf_init();
-  WiFi.begin(ssid, password);                                       
-  Serial.print("Connecting to WIFI");
-  while (WiFi.status() != WL_CONNECTED) {
-  Serial.print(".");
-  delay(500);
-  }
-
+  wm_init();
   firebase_init();
 }
 
 void loop(){
     Serial.println("loop");
     delay(1000);
-    if(rf_get_data())
+    if(rf_get_data() && wifi_connected)
     {
       firebase_update_readings();
     }

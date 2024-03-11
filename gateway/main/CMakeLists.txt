@@ -8,6 +8,7 @@ set(srcs
     main_project.cpp
     app_rf.cpp
     app_firebase.cpp
+    app_wm.cpp
   )
 
 

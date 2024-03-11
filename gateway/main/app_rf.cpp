@@ -6,7 +6,7 @@
 #include <RF24.h>
 #include "app_rf.h"
 
-RF24 radio(7, 8); // CE, CSN
+RF24 radio(RF_CE, RF_CS); // CE, CSN
 const byte address[6] = "00001";
 Data_Package data; 
 
