@@ -134,8 +134,8 @@ void read_sensors_values()
 
     if (mb_success == true)
     {
-      MT_M = regs[0];
-      MT_T = regs[1];
+      MT_M = regs[0]/10;
+      MT_T = regs[1]/10;
       data.MT_M = MT_M;
       data.MT_T = MT_T;
     }

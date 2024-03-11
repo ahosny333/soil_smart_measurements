@@ -15,6 +15,6 @@ struct Data_Package {
 };
 
 void rf_init();
-void rf_get_data();
+bool rf_get_data();
 
 #endif

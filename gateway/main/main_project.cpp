@@ -7,6 +7,7 @@
 #include "printf.h"
 #include "RF24.h"
 #include "app_rf.h"
+#include "app_firebase.h"
 
 
 
@@ -16,10 +17,14 @@ void setup(){
     ; // wait for serial port to connect
   }
   rf_init();
+  firebase_init();
 }
 
 void loop(){
     Serial.println("loop");
     delay(1000);
-    rf_get_data();
+    // if(rf_get_data())
+    // {
+
+    // }
 }

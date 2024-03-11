@@ -7,6 +7,7 @@ set(COMPONENT_REQUIRES ${requires} )
 set(srcs
     main_project.cpp
     app_rf.cpp
+    app_firebase.cpp
   )
 
 

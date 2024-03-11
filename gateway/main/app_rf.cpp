@@ -18,9 +18,13 @@ void rf_init() {
   radio.startListening();
 }
 
-void rf_get_data() {
+bool rf_get_data() {
   if (radio.available()) {
     radio.read(&data, sizeof(Data_Package)); // Read the whole data and store it into the 'data' structure
+    return true;
+  }
+  else{
+    return false;
   }
 }
 
