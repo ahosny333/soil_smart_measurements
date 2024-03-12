@@ -21,6 +21,8 @@ void rf_init() {
 bool rf_get_data() {
   if (radio.available()) {
     radio.read(&data, sizeof(Data_Package)); // Read the whole data and store it into the 'data' structure
+    Serial.println("received");
+    Serial.println(data.MT_M);
     return true;
   }
   else{

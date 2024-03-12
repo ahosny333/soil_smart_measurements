@@ -2,8 +2,8 @@
 #define APP_rf_H_
 #include "Arduino.h"
 
-#define RF_CE 7
-#define RF_CS 8
+#define RF_CE 4
+#define RF_CS 5
 
 struct Data_Package {
   uint16_t NPK_N = 0;
