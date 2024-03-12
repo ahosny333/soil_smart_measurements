@@ -26,7 +26,7 @@ uint16_t TIME_TO_SLEEP; /* time to sleep in seconds*/
 uint16_t WAKE_UP_TIME;  /* time to wake in sec */
 extern char ap_name[30];
 extern bool flashUpdateRequest;
-
+int x = 3;
 void setup()
 {
   Serial.begin(115200);
@@ -41,7 +41,7 @@ void setup()
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   sd_card_init();
   modbus_init();
-  //rf_init();
+  rf_init();
   wm_init();
   if (WiFi.getMode() == WIFI_AP)
   {
@@ -60,12 +60,18 @@ void setup()
 
 void loop()
 {
-
-    // Serial.println("inside waking period");
+  while (x>0)
+  {
+    x-=1;
+    Serial.println("inside waking period");
     read_sensors_values();
     data_serializer();
-    //rf_send_data();
-    delay(5000);
+    rf_send_data();
+    delay(6000);
+  }
+  
+    
+
 
   // if start ap for calibration
   if (WiFi.getMode() == WIFI_AP)
