@@ -16,6 +16,7 @@
 #include "RTClib.h"
 #include "app_sd.h"
 #include "app_rf.h"
+#include "app_rtc.h"
 
 // ESP32Time rtc;
 // ESP32Time rtc(0);
@@ -34,6 +35,7 @@ void setup()
     ; // wait for serial port to connect
   }
   readSystemVariables();
+  RTC_init();
   wake_timer = millis();
   Serial.println("starting");
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);

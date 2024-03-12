@@ -12,6 +12,7 @@ set(srcs
     app_webserver_idf.cpp
     app_sd.cpp
     app_rf.cpp
+    app_rtc.cpp
   )
 
 
