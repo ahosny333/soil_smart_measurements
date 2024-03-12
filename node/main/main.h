@@ -1,7 +1,7 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#define CLIENT "TEST"
+#define CLIENT "DEMO"
 #define NODE_ID 1
 #define FIRMWARE_VERSION "1.1"
 

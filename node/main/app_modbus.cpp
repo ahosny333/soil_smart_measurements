@@ -3,6 +3,9 @@
 #include <ArduinoJson.h>
 #include "app_modbus.h"
 
+extern bool sd_exist;
+extern bool rtc_exist;
+
 String jsonStr;
 ModbusRTU mb;
 uint16_t regs[5];
@@ -305,6 +308,10 @@ void read_sensors_values()
     PH_ok = true;
   }
 #endif
+  if(sd_exist && rtc_exist)
+  {
+    //log_data();
+  }
 }
 void data_serializer()
 {
