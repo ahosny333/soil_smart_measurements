@@ -18,8 +18,8 @@
 #include "app_rf.h"
 
 // ESP32Time rtc;
-ESP32Time rtc(0);
-bool rtc_done = false;
+// ESP32Time rtc(0);
+// bool rtc_done = false;
 uint32_t wake_timer = 0;
 uint16_t TIME_TO_SLEEP; /* time to sleep in seconds*/
 uint16_t WAKE_UP_TIME;  /* time to wake in sec */
@@ -39,8 +39,7 @@ void setup()
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   sd_card_init();
   modbus_init();
-  rf_init();
-  data_serializer();
+  //rf_init();
   wm_init();
   if (WiFi.getMode() == WIFI_AP)
   {
@@ -60,22 +59,29 @@ void setup()
 void loop()
 {
 
-  //  while( millis() - wake_timer < WAKE_UP_TIME *1000)
-  while (millis() - wake_timer < 240 * 1000)
-  {
-
     // Serial.println("inside waking period");
-    // if(rtc_done)
-    //   Serial.println(rtc.getTime("%A, %B %d %Y %H:%M:%S"));   // (String) returns time with specified format
     read_sensors_values();
     data_serializer();
-    rf_send_data();
+    //rf_send_data();
     delay(5000);
-    if (flashUpdateRequest)
+
+  // if start ap for calibration
+  if (WiFi.getMode() == WIFI_AP)
+  {
+    while( millis() - wake_timer < WAKE_UP_TIME *1000)
     {
-      flashUpdateRequest = false;
-      saveSystemVariables();
+      read_sensors_values();
+      data_serializer();
+      //rf_send_data();
+      delay(3000);
+      if (flashUpdateRequest)
+      {
+        flashUpdateRequest = false;
+        saveSystemVariables();
+      }
+
     }
+
   }
 
   Serial.println("start sleep");

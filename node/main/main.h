@@ -39,12 +39,12 @@
 
 //####################################################################
 // Enable Sensor 
-#define NPK_SENSOR 1 ////////////////////////////done
+// #define NPK_SENSOR 1 ////////////////////////////done
 #define MT_SENSOR 1 /////////////////////////////done
 #define T_M_EC_S_SENSOR 1 ///////////////////////done
 
-#define EC_SENSOR 1
-#define PH_SENSOR 1
+// #define EC_SENSOR 1
+// #define PH_SENSOR 1
 
 // to set slave id use address 254 and start address 201 in qmodmaster fc = 0x06 then write the required id to 5
 

@@ -13,6 +13,7 @@
 #include <ESP32Time.h>
 #include "mbedtls/base64.h"
 #include "main.h"
+#include "app_wifi.h"
 
 const char auth_username[15] = "admin";
 const char master_key[15] = "12345678";
@@ -20,8 +21,8 @@ char auth_password[15] = "";
 bool flashUpdateRequest = false;
 extern uint16_t TIME_TO_SLEEP;      
 extern uint16_t WAKE_UP_TIME; 
-extern ESP32Time rtc;
-extern bool rtc_done;
+// extern ESP32Time rtc;
+// extern bool rtc_done;
 extern bool sd_exist;
 extern String jsonStr;
 /* const httpd related values stored in ROM */
@@ -184,7 +185,7 @@ static esp_err_t basic_auth_get_handler(httpd_req_t *req, char *auth_pass)
 
 esp_err_t http_server_get_handler(httpd_req_t *req)
 {
-    //wm_activity_callback();
+    wm_activity_callback();
     char text_string[1822];
     // insert static routing code
     // if (strcmp(req->uri, "/") == 0)
@@ -377,45 +378,45 @@ esp_err_t http_server_get_handler(httpd_req_t *req)
         httpd_resp_set_type(req,http_content_type_txt);
         httpd_resp_send(req, text_string, HTTPD_RESP_USE_STRLEN);
     }
-    else if (strstr(req->uri, "/sync"))
-    {
-        memset(text_string, 0, sizeof(text_string));          
-        char*  buf;
-        size_t buf_len;
-        char temp_v[16];
-        buf_len = httpd_req_get_url_query_len(req) + 1;
-        if (buf_len > 1) {
-            buf = (char*)malloc(buf_len);
-            if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
-                //urldecode(buf);
-                //ESP_LOGI(TAG, "Found URL query => %s", buf);
-                /* Get value of expected key from query string */
-                if (httpd_query_key_value(buf, "ts", temp_v, sizeof(temp_v)) == ESP_OK) {
-                    //ESP_LOGI(TAG, "Found URL query => %s", buf);
-                    rtc.setTime(atoi(temp_v));
-                    rtc_done = true;
-                    flashUpdateRequest = true;
-                    memset(text_string, 0, sizeof(text_string));
-                    sprintf(text_string,"ok");
-                }
-            }
-            else
-            {
-                sprintf(text_string,"error");
-                rtc_done = false;
-            }
-            free(buf);
-        }
-        else
-        {
-            sprintf(text_string,"error");
-            rtc_done = false;
-        }
+    // else if (strstr(req->uri, "/sync"))
+    // {
+    //     memset(text_string, 0, sizeof(text_string));          
+    //     char*  buf;
+    //     size_t buf_len;
+    //     char temp_v[16];
+    //     buf_len = httpd_req_get_url_query_len(req) + 1;
+    //     if (buf_len > 1) {
+    //         buf = (char*)malloc(buf_len);
+    //         if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
+    //             //urldecode(buf);
+    //             //ESP_LOGI(TAG, "Found URL query => %s", buf);
+    //             /* Get value of expected key from query string */
+    //             if (httpd_query_key_value(buf, "ts", temp_v, sizeof(temp_v)) == ESP_OK) {
+    //                 //ESP_LOGI(TAG, "Found URL query => %s", buf);
+    //                 rtc.setTime(atoi(temp_v));
+    //                 rtc_done = true;
+    //                 flashUpdateRequest = true;
+    //                 memset(text_string, 0, sizeof(text_string));
+    //                 sprintf(text_string,"ok");
+    //             }
+    //         }
+    //         else
+    //         {
+    //             sprintf(text_string,"error");
+    //             rtc_done = false;
+    //         }
+    //         free(buf);
+    //     }
+    //     else
+    //     {
+    //         sprintf(text_string,"error");
+    //         rtc_done = false;
+    //     }
 
-        httpd_resp_set_status(req, http_200_hdr);
-        httpd_resp_set_type(req,http_content_type_txt);
-        httpd_resp_send(req,text_string, HTTPD_RESP_USE_STRLEN);
-    }
+    //     httpd_resp_set_status(req, http_200_hdr);
+    //     httpd_resp_set_type(req,http_content_type_txt);
+    //     httpd_resp_send(req,text_string, HTTPD_RESP_USE_STRLEN);
+    // }
     else if (strcmp(req->uri, "/ota.html") == 0)
     {      
         httpd_resp_set_status(req, http_200_hdr);
@@ -435,6 +436,7 @@ esp_err_t http_server_get_handler(httpd_req_t *req)
  */
 esp_err_t update_post_handler(httpd_req_t *req)
 {
+    wm_activity_callback();
 	char buf[1000];
 	esp_ota_handle_t ota_handle;
 	int remaining = req->content_len;
@@ -478,6 +480,7 @@ esp_err_t update_post_handler(httpd_req_t *req)
 }
 
 esp_err_t http_server_options_handler(httpd_req_t *req) {
+    wm_activity_callback();
     httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");  // Adjust origin as needed
     httpd_resp_set_hdr(req, "Access-Control-Allow-Credentials", "true");
     httpd_resp_set_hdr(req, "Access-Control-Allow-Headers", "Authorization");  // Customize allowed headers

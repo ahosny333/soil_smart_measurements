@@ -9,10 +9,11 @@
 char ap_name[30];
 static uint32_t initial_ap_timer = 0;
 char default_auth_password[] ="12345678";
+extern uint32_t wake_timer;
 
 void wm_activity_callback() {
 
-  
+  wake_timer = millis();   
   initial_ap_timer = millis();
 }
 
