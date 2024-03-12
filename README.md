@@ -25,8 +25,10 @@ cd esp-idf\
 export.bat
 cd ..                   
 cd gateway or cd node             # Go to the project directory
-idf.py build            # Compile the Project  
-idf.py -p PORT flash    # Flash the Project
+idf.py build                      # Compile the Project  
+idf.py -p PORT flash              # Flash the Project
+idf.py -p PORT monitor            # Monitor the Project
+idf.py -p PORT flash monitor      # Flash & monitor the Project
 ```
 
 ### Troubleshooting
