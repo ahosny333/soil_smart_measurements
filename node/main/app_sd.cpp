@@ -1,9 +1,17 @@
+#include "Arduino.h"
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
 #include "main.h"
+#include "app_modbus.h"
+#include <RTClib.h>
+#include "app_rtc.h"
 
 bool sd_exist = false;
+String data_log;
+extern Data_Package data;
+extern DateTime now;
+
 void sd_card_init()
 {
     if(!SD.begin(sd_card_ss_pin)){
@@ -184,3 +192,16 @@ void testFileIO(fs::FS &fs, const char * path){
   file.close();
 }
 
+void log_data()
+{
+  char date_time_format[100];
+  rtc_get_now_date();
+  sprintf(date_time_format,"%d/%d/%d - %d:%d:%d",now.day(),now.month(),now.year(),now.hour(),now.minute(),now.second());
+  data_log = String(date_time_format) + "," + String(data.MT_M) + "," + String(data.MT_T) + "," + String(data.T_M_EC_S_T) + "," + String(data.T_M_EC_S_M)+ "," + String(data.T_M_EC_S_EC) + "\r\n";
+  Serial.print("Saving data: ");
+  Serial.println(data_log);
+
+  //Append the data to file
+  appendFile(SD, "/data.csv", data_log.c_str());
+
+}

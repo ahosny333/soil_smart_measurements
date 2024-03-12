@@ -2,6 +2,7 @@
 #include "main.h"
 #include <ArduinoJson.h>
 #include "app_modbus.h"
+#include "app_sd.h"
 
 extern bool sd_exist;
 extern bool rtc_exist;
@@ -310,7 +311,7 @@ void read_sensors_values()
 #endif
   if(sd_exist && rtc_exist)
   {
-    //log_data();
+    log_data();
   }
 }
 void data_serializer()
