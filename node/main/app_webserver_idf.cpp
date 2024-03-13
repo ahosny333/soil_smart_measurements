@@ -50,6 +50,9 @@ const static char http_content_type_gz[] ="application/x-gzip";
 extern const uint8_t ota_html_start[] asm("_binary_ota_html_start");
 extern const uint8_t ota_html_end[] asm("_binary_ota_html_end");
 
+extern const uint8_t index_html_start[] asm("_binary_index_html_start");
+extern const uint8_t index_html_end[] asm("_binary_index_html_end");
+
 /**
  * Decode URL-encoded string in place.
  */
@@ -188,13 +191,13 @@ esp_err_t http_server_get_handler(httpd_req_t *req)
     wm_activity_callback();
     char text_string[1822];
     // insert static routing code
-    // if (strcmp(req->uri, "/") == 0)
-    // {
-    //     httpd_resp_set_status(req, http_200_hdr);
-    //     httpd_resp_set_type(req, http_content_type_html);
-    //     httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
-    //     httpd_resp_send(req, (const char *)index_html_gz_start, index_html_gz_end - index_html_gz_start);
-    // }
+    if (strcmp(req->uri, "/") == 0)
+    {
+        httpd_resp_set_status(req, http_200_hdr);
+        httpd_resp_set_type(req, http_content_type_html);
+        httpd_resp_set_hdr(req, "Content-Encoding", "html");
+        httpd_resp_send(req, (const char *)index_html_start, index_html_end - index_html_start);
+    }
     // else if (strcmp(req->uri, "/favicon.1e51c1d1.ico") == 0)
     // {
     //     httpd_resp_set_status(req, http_200_hdr);
@@ -316,7 +319,7 @@ esp_err_t http_server_get_handler(httpd_req_t *req)
         size_t buf_len;
         buf_len = httpd_req_get_url_query_len(req) + 1;
         if (buf_len > 1) {
-            char byte_temp[2],word_temp[6],word_temp2[6];
+            char word_temp[6];
             buf = (char*)malloc(buf_len);
             if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
                 urldecode(buf);

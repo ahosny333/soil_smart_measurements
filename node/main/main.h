@@ -1,11 +1,11 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#define CLIENT "DEMO"
+#define CLIENT "ELKADY"
 #define NODE_ID 1
 #define FIRMWARE_VERSION "1.1"
 
-// #define DEBUG 1
+//#define DEBUG 1
 #ifdef DEBUG
 #define DEBUG_PRINT(x) \
     Serial.print(x);   \
@@ -19,11 +19,15 @@
 #define DEBUG_PRINTLNDEC(x) \
     Serial.println(x, DEC); \
     Serial.flush()
+#define DEBUG_PRINTLNHEX(x) \
+    Serial.println(x, HEX); \
+    Serial.flush()
 #else
 #define DEBUG_PRINT(x)
 #define DEBUG_PRINTDEC(x)
 #define DEBUG_PRINTLN(x)
 #define DEBUG_PRINTLNDEC(x)
+#define DEBUG_PRINTLNHEX(x)
 #endif
 
 // Number of Retry Reading
@@ -92,8 +96,8 @@
 
 #define uS_TO_S_FACTOR 1000000 /* Conversion factor for micro seconds to seconds */
 #define INITIAL_AP_TIME 60000
-#define AP_MODE_PIN 21
-#define sd_card_ss_pin 5
+#define AP_MODE_PIN 19
+#define sd_card_ss_pin 27
 // #define TIME_TO_SLEEP  60        /* time to sleep in seconds*/
 // #define WAKE_UP_TIME    60000
 

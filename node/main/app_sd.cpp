@@ -11,24 +11,33 @@ bool sd_exist = false;
 String data_log;
 extern Data_Package data;
 extern DateTime now;
-
+SPIClass spiSD(HSPI);
 void sd_card_init()
 {
-    if(!SD.begin(sd_card_ss_pin)){
-        Serial.println("Card Mount Failed");
+  
+  spiSD.begin(26, 25, 13, sd_card_ss_pin); 
+
+    if(!SD.begin(sd_card_ss_pin,spiSD)){
+        DEBUG_PRINTLN("Card Mount Failed !!!");
         sd_exist = false;
         return;
     }
     uint8_t cardType = SD.cardType();
+    DEBUG_PRINT("card typr : ");
+    DEBUG_PRINTLN(cardType);
 
     if(cardType == CARD_NONE){
-        Serial.println("No SD card attached");
+        DEBUG_PRINTLN("No SD card attached");
         sd_exist = false;
         return;
     }
     else if(cardType == CARD_MMC){
-        Serial.println("MMC");
+        DEBUG_PRINTLN("MMC");
         sd_exist = true;
+    }
+    else if(cardType == CARD_SDHC){
+      DEBUG_PRINTLN("SDHC");
+      sd_exist = true;
     }
     else{
         sd_exist = false;
@@ -117,7 +126,7 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
 }
 
 void appendFile(fs::FS &fs, const char * path, const char * message){
-  Serial.printf("Appending to file: %s\n", path);
+  //Serial.printf("Appending to file: %s\n", path);
 
   File file = fs.open(path, FILE_APPEND);
   if(!file){
@@ -125,9 +134,9 @@ void appendFile(fs::FS &fs, const char * path, const char * message){
     return;
   }
   if(file.print(message)){
-      Serial.println("Message appended");
+      DEBUG_PRINTLN("Message appended");
   } else {
-    Serial.println("Append failed");
+    DEBUG_PRINTLN("Append failed");
   }
   file.close();
 }
@@ -197,11 +206,14 @@ void log_data()
   char date_time_format[100];
   rtc_get_now_date();
   sprintf(date_time_format,"%d/%d/%d - %d:%d:%d",now.day(),now.month(),now.year(),now.hour(),now.minute(),now.second());
-  data_log = String(date_time_format) + "," + String(data.MT_M) + "," + String(data.MT_T) + "," + String(data.T_M_EC_S_T) + "," + String(data.T_M_EC_S_M)+ "," + String(data.T_M_EC_S_EC) + "\r\n";
-  Serial.print("Saving data: ");
-  Serial.println(data_log);
+  data_log = String(date_time_format) + "," + String(data.MT_M) + "," + String(data.MT_T) + "," + String(data.T_M_EC_S_S) + "," + String(data.T_M_EC_S_M)+ "," + String(data.T_M_EC_S_EC) + "\r\n";
+  DEBUG_PRINT("Saving data: ");
+  DEBUG_PRINTLN(data_log);
+  // Serial.print("Saving data: ");
+  // Serial.println(data_log);
 
   //Append the data to file
+  spiSD.begin(26, 25, 13, sd_card_ss_pin);
   appendFile(SD, "/data.csv", data_log.c_str());
 
 }

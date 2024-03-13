@@ -5,6 +5,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "app_rf.h"
+#include "main.h"
 
 RF24 radio(RF_CE, RF_CS); // CE, CSN
 const byte address[6] = "00001";
@@ -21,8 +22,8 @@ void rf_init() {
 bool rf_get_data() {
   if (radio.available()) {
     radio.read(&data, sizeof(Data_Package)); // Read the whole data and store it into the 'data' structure
-    Serial.println("received");
-    Serial.println(data.MT_M);
+    DEBUG_PRINTLN("received");
+    DEBUG_PRINTLN(data.T_M_EC_S_EC);
     return true;
   }
   else{

@@ -37,7 +37,7 @@ void setup()
   readSystemVariables();
   RTC_init();
   wake_timer = millis();
-  Serial.println("starting");
+  DEBUG_PRINTLN("starting");
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   sd_card_init();
   modbus_init();
@@ -52,7 +52,7 @@ void setup()
     }
     else
     {
-      Serial.println("Error starting mDNS");
+      DEBUG_PRINTLN("Error starting mDNS");
     }
     webserver_task();
   }
@@ -63,11 +63,16 @@ void loop()
   while (x>0)
   {
     x-=1;
-    Serial.println("inside waking period");
+    DEBUG_PRINTLN("inside waking period");
     read_sensors_values();
-    data_serializer();
+    //data_serializer();
     rf_send_data();
-    delay(6000);
+    if (flashUpdateRequest)
+    {
+      flashUpdateRequest = false;
+      saveSystemVariables();
+    }
+    delay(4000);
   }
   
     
@@ -80,7 +85,9 @@ void loop()
     {
       read_sensors_values();
       data_serializer();
-      //rf_send_data();
+
+      rf_send_data();
+
       delay(3000);
       if (flashUpdateRequest)
       {
@@ -92,7 +99,7 @@ void loop()
 
   }
 
-  Serial.println("start sleep");
+  DEBUG_PRINTLN("start sleep");
   esp_deep_sleep_start();
-  Serial.println("loop"); // can not come here
+  DEBUG_PRINTLN("loop"); // can not come here
 }

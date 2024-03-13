@@ -24,10 +24,14 @@ void setup(){
 }
 
 void loop(){
-    Serial.println("loop");
-    delay(1000);
+    DEBUG_PRINTLN("loop");
+    //Serial.println("serial loop");
+    delay(500);
     if(rf_get_data() && wifi_connected)
     {
-      firebase_update_readings();
+      
+        firebase_update_readings();
+  
+    
     }
 }

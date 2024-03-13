@@ -1,15 +1,15 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#define CLIENT "TEST"
+#define CLIENT "ELCADY"
 #define FIRMWARE_VERSION "1.1"
 
-#define ssid     "ICITY"       // replace with your SSID
-#define password  "iEgyptCity"          //replace with your Password
+#define ssid     "Agrimachinery_B"       // replace with your SSID
+#define password  "Agri@131"          //replace with your Password
 // #define ssid     "eng.hosni"       // replace with your SSID
 // #define password  "ahmedhosnyohaj"          //replace with your Password
 
-// #define DEBUG 1
+//#define DEBUG 1
 #ifdef DEBUG
 #define DEBUG_PRINT(x) \
     Serial.print(x);   \

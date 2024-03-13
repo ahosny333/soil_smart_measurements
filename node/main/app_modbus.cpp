@@ -42,8 +42,8 @@ Data_Package data;
 
 bool HRead(Modbus::ResultCode event, uint16_t transactionId, void *data)
 {
-  Serial.print("Request result: 0x");
-  Serial.println(event, HEX);
+  DEBUG_PRINT("Request result: 0x");
+  DEBUG_PRINTLNHEX(event);
   if (event == 0x00)
   {
     mb_success = true;
@@ -64,8 +64,8 @@ void read_sensors_values()
 
   //////////////////////////////////////////////////////
 
-  Serial.println("------------------------------------------------");
-  Serial.println("NPK_SENSOR");
+  DEBUG_PRINTLN("------------------------------------------------");
+  DEBUG_PRINTLN("NPK_SENSOR");
 #ifdef NPK_SENSOR
   retry_counter = 0;
   addr = NPK_SENSOR_START_ADD;
@@ -98,9 +98,9 @@ void read_sensors_values()
       NPK_K = 0;
     }
 
-    Serial.println(NPK_N);
-    Serial.println(NPK_P);
-    Serial.println(NPK_K);
+    DEBUG_PRINTLN(NPK_N);
+    DEBUG_PRINTLN(NPK_P);
+    DEBUG_PRINTLN(NPK_K);
 
     delay(1000);
     retry_counter++;
@@ -117,8 +117,8 @@ void read_sensors_values()
 #endif
   ////////////////////////////////////////////////////////
 
-  Serial.println("------------------------------------------------");
-  Serial.println("MT_SENSOR");
+  DEBUG_PRINTLN("------------------------------------------------");
+  DEBUG_PRINTLN("MT_SENSOR");
 #ifdef MT_SENSOR
   retry_counter = 0;
   addr = MT_SENSOR_START_ADD;
@@ -138,10 +138,16 @@ void read_sensors_values()
 
     if (mb_success == true)
     {
-      MT_M = regs[0]/10;
-      MT_T = regs[1]/10;
-      data.MT_M = MT_M;
-      data.MT_T = MT_T;
+      MT_M = regs[0];
+      MT_T = regs[1];
+      // Serial.print(" raw m : ");
+      // Serial.println(MT_M);
+      data.MT_M = MT_M * 10 /37 ;
+      if(data.MT_M > 100)
+      {
+        data.MT_M = 100;
+      }
+      data.MT_T = MT_T / 10;
     }
     else
     {
@@ -149,8 +155,8 @@ void read_sensors_values()
       MT_T = 0;
     }
 
-    Serial.println(MT_M);
-    Serial.println(MT_T);
+    DEBUG_PRINTLN(data.MT_M);
+    DEBUG_PRINTLN(data.MT_T);
 
     delay(1000);
     retry_counter++;
@@ -167,8 +173,8 @@ void read_sensors_values()
 #endif
 
   ////////////////////////////////////////////////////////
-  Serial.println("------------------------------------------------");
-  Serial.println("T_M_EC_S_SENSOR");
+  DEBUG_PRINTLN("------------------------------------------------");
+  DEBUG_PRINTLN("T_M_EC_S_SENSOR");
 #ifdef T_M_EC_S_SENSOR
   retry_counter = 0;
   addr = T_M_EC_S_SENSOR_START_ADD;
@@ -185,12 +191,18 @@ void read_sensors_values()
     delay(1000);
     if (mb_success == true)
     {
-      T_M_EC_S_T = regs[0];
-      T_M_EC_S_M = regs[1];
+      T_M_EC_S_T = regs[1];
+      T_M_EC_S_M = regs[0];
       T_M_EC_S_EC = regs[2];
       T_M_EC_S_S = regs[3];
-      data.T_M_EC_S_T = T_M_EC_S_T;
-      data.T_M_EC_S_M = T_M_EC_S_M;
+      // Serial.print("raw ec m :");
+      // Serial.println(T_M_EC_S_M);
+      data.T_M_EC_S_T = T_M_EC_S_T/100;
+      data.T_M_EC_S_M = T_M_EC_S_M *1/37;
+      if(data.T_M_EC_S_M > 100)
+      {
+        data.T_M_EC_S_M = 100;
+      }
       data.T_M_EC_S_EC = T_M_EC_S_EC;
       data.T_M_EC_S_S = T_M_EC_S_S;
     }
@@ -201,10 +213,10 @@ void read_sensors_values()
       T_M_EC_S_EC = 0;
       T_M_EC_S_S = 0;
     }
-    Serial.println(T_M_EC_S_T);
-    Serial.println(T_M_EC_S_M);
-    Serial.println(T_M_EC_S_EC);
-    Serial.println(T_M_EC_S_S);
+    DEBUG_PRINTLN(data.T_M_EC_S_T);
+    DEBUG_PRINTLN(data.T_M_EC_S_M);
+    DEBUG_PRINTLN(data.T_M_EC_S_EC);
+    DEBUG_PRINTLN(data.T_M_EC_S_S);
     delay(1000);
     retry_counter++;
   }
@@ -219,8 +231,8 @@ void read_sensors_values()
 #endif
 
   ////////////////////////////////////////////////////////
-  Serial.println("------------------------------------------------");
-  Serial.println("EC_SENSOR");
+  DEBUG_PRINTLN("------------------------------------------------");
+  DEBUG_PRINTLN("EC_SENSOR");
 #ifdef EC_SENSOR
   retry_counter = 0;
   addr = EC_SENSOR_START_ADD;
@@ -247,8 +259,8 @@ void read_sensors_values()
       EC_M = 0;
     }
 
-    Serial.println(EC_T);
-    Serial.println(EC_M);
+    DEBUG_PRINTLN(EC_T);
+    DEBUG_PRINTLN(EC_M);
 
     delay(1000);
     retry_counter++;
@@ -265,8 +277,8 @@ void read_sensors_values()
 #endif
 
   ////////////////////////////////////////////////////////
-  Serial.println("------------------------------------------------");
-  Serial.println("PH_SENSOR");
+  DEBUG_PRINTLN("------------------------------------------------");
+  DEBUG_PRINTLN("PH_SENSOR");
 #ifdef PH_SENSOR
   retry_counter = 0;
   addr = PH_SENSOR_START_ADD;
@@ -293,8 +305,8 @@ void read_sensors_values()
       PH_M = 0;
     }
 
-    Serial.println(PH_T);
-    Serial.println(PH_M);
+    DEBUG_PRINTLN(PH_T);
+    DEBUG_PRINTLN(PH_M);
 
     delay(1000);
     retry_counter++;
@@ -312,6 +324,12 @@ void read_sensors_values()
   if(sd_exist && rtc_exist)
   {
     log_data();
+  }
+  else{
+    DEBUG_PRINTLN("not logged data");
+    DEBUG_PRINTLN(sd_exist);
+    DEBUG_PRINTLN(rtc_exist);
+
   }
 }
 void data_serializer()
@@ -438,5 +456,5 @@ void data_serializer()
   root.printTo(jsonStr);
 
   // Print the JSON string
-  Serial.println(jsonStr);
+  DEBUG_PRINTLN(jsonStr);
 }

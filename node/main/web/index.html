@@ -1,1 +1,170 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title></title><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="/index.2ee4243c.css"><link rel="icon shortcut" type="image/x-icon" href="/favicon.7ad4759e.ico"></head><body> <div id="root"></div> <script type="module" src="/index.2ee2a97a.js"></script> </body></html>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Node </title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .device-info,
+        .battery-status,
+        .measurements {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .measurements div {
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+
+        /* تنسيقات فردية لكل قياس */
+        .label-N {
+            background-color: #1f77b4;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .label-P {
+            background-color: #1f77b4;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .label-K {
+            background-color: #1f77b4;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .label-M {
+            background-color: #e377c2;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .label-T {
+            background-color: #e377c2;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .label-EC {
+            background-color: #e377c2;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .label-S {
+            text-align: center;
+            font-weight: bold;
+            background-color: #e377c2;
+        }
+
+        .label-E {
+            text-align: center;
+            font-weight: bold;
+            background-color: #bcbd22;
+        }
+
+        .label-C {
+            font-weight: bold;
+            text-align: center;
+            background-color: #bcbd22;
+        }
+
+        .label-H {
+            text-align: center;
+            font-weight: bold;
+            background-color: #17becf;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="device-info">
+            <label for="device-number">Device-info :</label>
+            <span id="device-number"></span>
+        </div>
+        <div class="battery-status">
+            <label for="battery-status">Battery-status :</label>
+            <span id="battery-status"></span>
+        </div>
+        <div class="measurements">
+            <label for="measurements">Measurement:</label>
+            <div id="measurements"></div>
+        </div>
+    </div>
+
+    <script>
+        setInterval(() => {
+            fetch('http://192.168.4.1/get_readings')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('device-number').textContent = data.n;
+                    document.getElementById('battery-status').textContent = data.b;
+
+                    let measurementsHTML = '';
+                    data.r.forEach(measurement => {
+                        const measurementType = Object.keys(measurement)[0];
+                        const values = measurement[measurementType];
+                        let labels = [];
+
+                        switch (measurementType) {
+                            case 'NPK':
+                                labels = ['N', 'P', 'K'];
+                                break;
+                            case 'MT':
+                                labels = ['M', 'T'];
+                                break;
+                            case 'T_M_EC_S':
+                                labels = ['T', 'M', 'EC', 'S'];
+                                break;
+                            case 'EC':
+                                labels = ['E', 'C'];
+                                break;
+                            case 'PH':
+                                labels = ['P', 'H'];
+                                break;
+                            default:
+                                labels = values.map((_, index) => String.fromCharCode(65 + index));
+                                break;
+                        }
+
+                        measurementsHTML += `<div><strong>${measurementType}:</strong></div>`;
+                        values.forEach((value, index) => {
+                            measurementsHTML += `<div class="label-${labels[index]}">${labels[index]}: ${value}</div>`;
+                        });
+                    });
+
+                    document.getElementById('measurements').innerHTML = measurementsHTML;
+                })
+                .catch(error => console.error('Fetch error:', error));
+        }, 1000);  
+    </script>
+</body>
+
+</html>
