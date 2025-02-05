@@ -1,6 +1,6 @@
-## Soil Sensor Node V2.
+## Soil smart measurements.
 
-The Soil Sensor Node is a device designed to monitor and analyze soil condi􀆟ons in agricultural and
+The Soil smart measurements is a device designed to monitor and analyze soil conditions in agricultural and
 environmental applications.
 
 ### Install the application after first clone.
@@ -34,7 +34,6 @@ idf.py -p PORT flash monitor      # Flash & monitor the Project
 ### Troubleshooting
 
 * Program upload failure
-
-    * Hardware connection is not correct: run `idf.py -p PORT monitor`, and reboot your board to see if there are any output logs.
-    * The baud rate for downloading is too high: lower your baud rate in the `menuconfig` menu, and try again.
+* Hardware connection is not correct: run `idf.py -p PORT monitor`, and reboot your board to see if there are any output logs.
+* The baud rate for downloading is too high: lower your baud rate in the `menuconfig` menu, and try again.
 
